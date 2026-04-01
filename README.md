@@ -22,10 +22,10 @@ The buck converters were mathematically tuned to achieve an output voltage rippl
 * **Switching Frequency ($f_{sw}$):** 400kHz
 * **Internal Reference Voltage ($V_{ref}$):** 0.596V
 
-### 1. The 5V Logic Rail
+### 1. The 5V Rail
 
-#### A. Voltage Step-Down (Feedback Network)
-The TPS54302 steps down the 12V input by rapidly switching on and off. The exact 5V output is maintained by a resistor divider network ($R_3$ and $R_4$) that feeds a scaled-down voltage back to the chip's internal reference.
+#### A. Voltage Step-Down
+The TPS54302 steps down the 12V input by rapidly switching on and off. The exact 5V output is maintained by a resistor divider network ($R_3$ and $R_4$) that feeds a scaled down voltage back to the chip's internal reference.
 * **Calculated Output ($V_{out}$):**
   $$V_{out} = V_{ref} \cdot \left(1 + \frac{R_{top}}{R_{bot}}\right)$$
   $$V_{out} = 0.596\text{V} \cdot \left(1 + \frac{100\text{k}\Omega}{13.3\text{k}\Omega}\right) \approx \mathbf{5.07\text{V}}$$
@@ -39,8 +39,8 @@ The primary inductor ($L_3 = 10\mu\text{H}$) and bulk capacitor ($C_4 = 22\mu\te
   $$\Delta V_{out1} = \frac{\Delta I_L}{8 \cdot f_{sw} \cdot C_4}$$
   $$\Delta V_{out1} = \frac{0.729}{8 \cdot 400000 \cdot 22\times 10^{-6}} \approx \mathbf{10.3\text{mV}}$$
 
-#### C. Stage 2: Out-of-Loop Pi-Filter
-To prevent the 10.3mV ripple from interfering with logic thresholds, a secondary low-pass filter ($L_2$ Ferrite Bead + $C_5$ $10\mu\text{F}$ Capacitor) physically blocks high-frequency switching harmonics.
+#### C. Stage 2: Pi-Filter
+To prevent the 10.3mV ripple from interfering with logic thresholds, a secondary low pass filter ($L_2$ Ferrite Bead + $C_5$ $10\mu\text{F}$ Capacitor) physically blocks high frequency switching harmonics.
 * **Filter Attenuation Factor ($A$) at 400kHz ($L_{ferrite} \approx 1\mu\text{H}$):**
   $$A = \frac{1}{(2\pi \cdot f_{sw})^2 \cdot L_{ferrite} \cdot C_5}$$
   $$A = \frac{1}{(2\pi \cdot 400000)^2 \cdot 1\times 10^{-6} \cdot 10\times 10^{-6}} \approx \mathbf{0.0158}$$
@@ -64,7 +64,7 @@ Tuned specifically for the lower voltage drop, utilizing $L_4 = 6.8\mu\text{H}$ 
 * **Stage 1 Voltage Ripple ($\Delta V_{out1}$):**
   $$\Delta V_{out1} = \frac{0.879}{8 \cdot 400000 \cdot 22\times 10^{-6}} \approx \mathbf{12.5\text{mV}}$$
 
-#### C. Stage 2: Out-of-Loop Pi-Filter
+#### C. Stage 2: Pi-Filter
 Utilizing an identical Pi-Filter configuration ($L_5$ Ferrite Bead + $C_9$ $10\mu\text{F}$ Capacitor), the attenuation factor remains identical ($A = 0.0158$).
 * **Final 3.3V Output Ripple ($\Delta V_{total}$):**
   $$\Delta V_{total} = 12.5\text{mV} \cdot 0.0158 \approx \mathbf{0.20\text{mV}}$$
