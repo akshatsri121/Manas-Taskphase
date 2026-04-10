@@ -5,9 +5,10 @@
 A custom high current Power Distribution Board (PDB) designed specifically for a differential drive robot. This board takes a raw battery input and cleanly steps it down into three isolated, logic level power rails (5V, 3.3V, 1.8V) while actively monitoring system wide power consumption in real time.
 
 ## Board Renders
-><img width="1320" height="727" alt="image" src="https://github.com/user-attachments/assets/e7a16924-3da8-4de8-9d1e-7e7664667b60" />
-><img width="1335" height="746" alt="image" src="https://github.com/user-attachments/assets/60dcc3f6-9299-4f64-ae30-8de73d6b40ee" />
-><img width="1467" height="837" alt="image" src="https://github.com/user-attachments/assets/fb92a939-6519-4219-bc9d-9347f600ed22" />
+<img width="583" height="937" alt="image" src="https://github.com/user-attachments/assets/104199e4-6343-4e72-89a6-c7b4c0c24383" />
+<img width="638" height="1038" alt="image" src="https://github.com/user-attachments/assets/7889687e-9843-4e33-9a75-6758d1feeb70" />
+
+
 
 ## Key Features
 * **Active Power Monitoring:** Integrated INA219 High side current and voltage monitor. Measures total current across a shunt resistor and reports data back to the microcontroller using I2C (SDA/SCL).
