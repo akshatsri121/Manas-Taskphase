@@ -5,8 +5,10 @@
 A custom high current Power Distribution Board (PDB) designed specifically for a differential drive robot. This board takes a raw battery input and cleanly steps it down into three isolated, logic level power rails (5V, 3.3V, 1.8V) while actively monitoring system wide power consumption in real time.
 
 ## Board Renders
-<img width="583" height="937" alt="image" src="https://github.com/user-attachments/assets/104199e4-6343-4e72-89a6-c7b4c0c24383" />
-<img width="638" height="1038" alt="image" src="https://github.com/user-attachments/assets/7889687e-9843-4e33-9a75-6758d1feeb70" />
+<img width="582" height="942" alt="image" src="https://github.com/user-attachments/assets/7db5a91c-51ed-49f9-9d07-c7ab27585c84" />
+<img width="646" height="1039" alt="image" src="https://github.com/user-attachments/assets/47237dc5-682b-4bb6-bfab-a1696dcee740" />
+
+
 
 
 
