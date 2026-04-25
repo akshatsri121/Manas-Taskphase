@@ -17,12 +17,11 @@ A custom high current Power Distribution Board (PDB) designed specifically for a
 
 ## Key Features
 * **Active Power Monitoring:** Integrated INA219 High side current and voltage monitor. Measures total current across a shunt resistor and reports data back to the microcontroller using I2C (SDA/SCL).
-* **5V/3.3V Rail:** Used TPS54302 step down Buck Converter. Tuned for <10mV ripple using a LC filter. Isolates power for 3.3V logic and sensors
+* **5V/3.3V Rail:** Used TPS54302 step down Buck Converter. Isolates power for 3.3V logic and sensors
 * **1.8V Rail:** Derived from the 3.3V rail using AP2112K-1.8 low dropout regulator (LDO) for sensitive components.
-* **Mechanical Realiability:** 2-layer design with top and bottom ground planes for electromagnetic shielding, via stitched thermal relief, dedicated mounting holes for robot chassis.
+* **Mechanical Realiability:** 2-layer design with top and bottom ground planes for electromagnetic shielding, via stitched solid pours.
 
 ## System architecture and Calculations
-The buck converters were mathematically tuned to achieve an output voltage ripple of under `~10mV`
 
 * **Input Voltage ($V_{in}$):** 12V (Battery)
 * **Switching Frequency ($f_{sw}$):** 400kHz
