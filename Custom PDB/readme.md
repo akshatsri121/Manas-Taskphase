@@ -8,72 +8,51 @@ A custom high current Power Distribution Board (PDB) designed specifically for a
 <img width="1367" height="1021" alt="image" src="https://github.com/user-attachments/assets/01aa3568-f8e7-490f-b162-226bb0ca5581" />
 <img width="1146" height="926" alt="image" src="https://github.com/user-attachments/assets/99cf9ab5-415e-4aaa-aafe-cb3bd210aba3" />
 
-
-
-
-
-
-
-
 ## Key Features
 * **Active Power Monitoring:** Integrated INA219 High side current and voltage monitor. Measures total current across a shunt resistor and reports data back to the microcontroller using I2C (SDA/SCL).
-* **5V/3.3V Rail:** Used TPS54302 step down Buck Converter. Isolates power for 3.3V logic and sensors
+* **5V/3.3V Rail:** Used TPS54302 step down Buck Converter. Isolates power for 3.3V logic and sensors.
 * **1.8V Rail:** Derived from the 3.3V rail using AP2112K-1.8 low dropout regulator (LDO) for sensitive components.
-* **Mechanical Realiability:** 2-layer design with top and bottom ground planes for electromagnetic shielding, via stitched solid pours.
+* **Mechanical Reliability:** 2-layer design with top and bottom ground planes for electromagnetic shielding, via stitched solid pours.
 
-## System architecture and Calculations
+## System Architecture and Calculations
 
-* **Input Voltage ($V_{in}$):** 12V (Battery)
+* **Input Voltage ($V_{in}$):** 12V (Battery Nominal), up to 16.8V (4S LiPo Max)
 * **Switching Frequency ($f_{sw}$):** 400kHz
 * **Internal Reference Voltage ($V_{ref}$):** 0.596V
 
-### 1. The 5V Rail
+### 1. Battery Voltage Sensing (V-Sense)
+A voltage divider scales the main battery voltage down to a safe level for a standard 3.3V ADC.
+* **Resistors:** R10 = 10kΩ, R1 = 2.2kΩ
+* **Divider Ratio:**
+  $$V_{ADC} = V_{BATT} \cdot \left(\frac{2.2}{10 + 2.2}\right) \approx V_{BATT} \cdot 0.1803$$
+* **Calculated Thresholds:**
+  * **@ 16.8V (4S LiPo Max):** 16.8V * 0.1803 = **3.03V** *(Safely below 3.3V limit)*
+  * **@ 14.4V (Nominal):** 14.4V * 0.1803 = **2.59V**
+  * **@ 12.0V (Discharged):** 12.0V * 0.1803 = **2.16V**
 
-#### A. Voltage Step-Down
-The TPS54302 steps down the 12V input by rapidly switching on and off. The exact 5V output is maintained by a resistor divider network ($R_3$ and $R_4$) that feeds a scaled down voltage back to the chip's internal reference.
+### 2. The 5V Rail
+The TPS54302 steps down the 12V input by rapidly switching on and off. The exact 5V output is maintained by a resistor divider network (R3 and R4) that feeds a scaled-down voltage back to the chip's internal reference.
 * **Calculated Output ($V_{out}$):**
   $$V_{out} = V_{ref} \cdot \left(1 + \frac{R_{top}}{R_{bot}}\right)$$
-  $$V_{out} = 0.596\text{V} \cdot \left(1 + \frac{100\text{k}\Omega}{13.3\text{k}\Omega}\right) \approx \mathbf{5.07\text{V}}$$
+  $$V_{out} = 0.596 \cdot \left(1 + \frac{100}{13.3}\right) \approx 5.07\text{V}$$
+* **Output Current Limit:** 3.0A (Maximum rating of the TPS54302)
+* **Max Estimated Input Current:** ~1.39A *(Assuming a 12V input supplying 15W output at 90% converter efficiency)*
 
-#### B. Stage 1: Main LC Filter
-The primary inductor ($L_3 = 10\mu\text{H}$) and bulk capacitor ($C_4 = 22\mu\text{F}$) absorb the violent switching pulses to create a stable DC voltage with a slight ripple.
-* **Inductor Ripple Current ($\Delta I_L$):**
-  $$\Delta I_L = \frac{V_{out} \cdot (V_{in} - V_{out})}{V_{in} \cdot f_{sw} \cdot L_3}$$
-  $$\Delta I_L = \frac{5 \cdot (12 - 5)}{12 \cdot 400000 \cdot 10\times 10^{-6}} = \mathbf{0.729\text{A}}$$
-* **Stage 1 Voltage Ripple ($\Delta V_{out1}$):**
-  $$\Delta V_{out1} = \frac{\Delta I_L}{8 \cdot f_{sw} \cdot C_4}$$
-  $$\Delta V_{out1} = \frac{0.729}{8 \cdot 400000 \cdot 22\times 10^{-6}} \approx \mathbf{10.3\text{mV}}$$
-
-#### C. Stage 2: Pi-Filter
-To prevent the 10.3mV ripple from interfering with logic thresholds, a secondary low pass filter ($L_2$ Ferrite Bead + $C_5$ $10\mu\text{F}$ Capacitor) physically blocks high frequency switching harmonics.
-* **Filter Attenuation Factor ($A$) at 400kHz ($L_{ferrite} \approx 1\mu\text{H}$):**
-  $$A = \frac{1}{(2\pi \cdot f_{sw})^2 \cdot L_{ferrite} \cdot C_5}$$
-  $$A = \frac{1}{(2\pi \cdot 400000)^2 \cdot 1\times 10^{-6} \cdot 10\times 10^{-6}} \approx \mathbf{0.0158}$$
-* **Final 5V Output Ripple ($\Delta V_{total}$):**
-  $$\Delta V_{total} = \Delta V_{out1} \cdot A$$
-  $$\Delta V_{total} = 10.3\text{mV} \cdot 0.0158 \approx \mathbf{0.16\text{mV}}$$
-
----
-
-### 2. The 3.3V Sensor Rail
-
-#### A. Voltage Step-Down (Feedback Network)
-Similar to the 5V rail, the 3.3V rail uses a distinct resistor divider ($R_5$ and $R_6$) to program the output.
+### 3. The 3.3V Sensor Rail
+Similar to the 5V rail, the 3.3V rail uses a distinct resistor divider (R5 and R6) to program the output.
 * **Calculated Output ($V_{out}$):**
-  $$V_{out} = 0.596\text{V} \cdot \left(1 + \frac{100\text{k}\Omega}{22.1\text{k}\Omega}\right) \approx \mathbf{3.29\text{V}}$$
+  $$V_{out} = 0.596 \cdot \left(1 + \frac{100}{22.1}\right) \approx 3.29\text{V}$$
+* **Output Current Limit:** 3.0A
+* **Max Estimated Input Current:** ~0.92A *(Assuming a 12V input supplying 9.9W output at 90% converter efficiency)*
 
-#### B. Stage 1: Main LC Filter
-Tuned specifically for the lower voltage drop, utilizing $L_4 = 6.8\mu\text{H}$ and $C_8 = 22\mu\text{F}$.
-* **Inductor Ripple Current ($\Delta I_L$):**
-  $$\Delta I_L = \frac{3.3 \cdot (12 - 3.3)}{12 \cdot 400000 \cdot 6.8\times 10^{-6}} = \mathbf{0.879\text{A}}$$
-* **Stage 1 Voltage Ripple ($\Delta V_{out1}$):**
-  $$\Delta V_{out1} = \frac{0.879}{8 \cdot 400000 \cdot 22\times 10^{-6}} \approx \mathbf{12.5\text{mV}}$$
+### 4. 1.8V Linear Regulator (AP2112K-1.8)
+* **Input Voltage:** 3.3V (Fed directly from the 3.3V Buck rail)
+* **Output Voltage:** 1.8V (Fixed)
+* **Max Output Current:** 600mA
 
-#### C. Stage 2: Pi-Filter
-Utilizing an identical Pi-Filter configuration ($L_5$ Ferrite Bead + $C_9$ $10\mu\text{F}$ Capacitor), the attenuation factor remains identical ($A = 0.0158$).
-* **Final 3.3V Output Ripple ($\Delta V_{total}$):**
-  $$\Delta V_{total} = 12.5\text{mV} \cdot 0.0158 \approx \mathbf{0.20\text{mV}}$$
-
----
-
-
+### 5. Power Monitor (INA219)
+The INA219 monitors the total battery current utilizing a precision shunt resistor.
+* **Shunt Resistor (R11):** 3mΩ (0.003Ω)
+* **Max Measurable Voltage Drop:** ±320mV (Limit of the INA219 PGA)
+* **Max Measurable Current:**
+  $$I_{max} = \frac{320\text{mV}}{3\text{m}\Omega} = 106.67\text{A}$$
